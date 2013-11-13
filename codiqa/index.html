@@ -13,12 +13,44 @@
   <script src="js/jquery-1.9.1.min.js"></script>
   <script src="js/jquery.mobile-1.3.1.min.js"></script>
   <script src="js/codiqa.ext.min.js"></script>
-  <script src="js/mybooks.js"></script>
+  <script src="apigee.js"></script> 
+  <script type="text/javascript">
+  //This would normally live in an external js file
+ // Initializing the SDK
+            var client = new Apigee.Client({
+                orgName:'carriecarter', // Your Apigee.com username for App Services
+                appName:'sandbox' // Your Apigee App Services app name
+            });
+            
+            // Reading data
+            var books = new Apigee.Collection({ "client":client, "type":"books" });
+            books.fetch(
+                function(err, data) { // Success
+                    if (err) {
+                        alert("read failed");
+                    } else {
+                        $('#books-list').empty();
+                        while(books.hasNextEntity()) {
+                            var book = books.getNextEntity();
+                            //alert(book.get("title")); // Output the title of the book
+                            $('#books-list').append('<li><h3>'+book.get('title')+'</h3><p>'+book.get('author')+'</p></li>');
+                        }
+                        $('#books-list').listview('refresh');
+                    }
+                });
+
+            // Uncomment the next 4 lines if you want to write data
+           
+            book = { "title": "old man and the sea") };
+            books.addEntity(book, function (error, response) {
+             if (error) { alert("write failed");
+            } else { alert("write succeeded"); } });
+  </script>
 </head>
 <body>
   <div data-role="page" data-control-title="Home" id="page1">
       <div data-theme="a" data-role="header">
-          <a data-role="button" href="#page1" data-icon="plus" data-iconpos="right"
+          <a href="#form" data-transition="slide" data-rel="dialog" data-role="button" href="#page1" data-icon="plus" data-iconpos="right"
           class="ui-btn-right">
               Add
           </a>
@@ -27,7 +59,7 @@
           </h3>
       </div>
       <div data-role="content">
-          <ul data-role="listview" data-divider-theme="" data-inset="false">
+          <ul id="books-list" data-role="listview" data-divider-theme="" data-inset="false">
               <li data-theme="">
                   First Title
               </li>
@@ -37,5 +69,34 @@
           </ul>
       </div>
   </div>
+  <div data-role="page" data-control-title="form" id="form">
+    <div data-theme="a" data-role="header">
+        <h3>
+            Add A Book
+        </h3>
+    </div>
+    <div data-role="content">
+        <form action="">
+            <div data-role="fieldcontain" data-controltype="textinput">
+                <label for="textinput2">
+                    Title
+                </label>
+                <input name="" id="textinput2" placeholder="" value="" type="text">
+            </div>
+            <div data-role="fieldcontain" data-controltype="textinput">
+                <label for="textinput3">
+                    Author
+                </label>
+                <input name="" id="textinput3" placeholder="" value="" type="text">
+            </div>
+            <a id="create-button" data-role="button" data-inline="true" data-theme="a" href="#form">
+                Create
+            </a>
+            <a id="cancel-button" data-role="button" data-inline="true" data-theme="a" href="#form">
+                Cancel
+            </a>
+        </form>
+    </div>
+</div>
 </body>
 </html>
