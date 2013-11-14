@@ -18,15 +18,18 @@
             // A Collection object that will be used to hold the list of books locally
             var my_books = new Apigee.Collection( { "client":apigee, "type":"books" } );
 
-
             $(document).ready(function () {
                 $('#create-button').bind('click', createBook);
+
+                navigator.geolocation.getCurrentPosition(loadBooks)
             });
 
-            loadBooks();
+            function loadBooks (location) {
+                // We now define my_books within the local scope
+                // so we can pass it our latitude & longitude
+                var my_books = new Apigee.Collection( { "client":apigee, "type":"books", "qs":{"ql":"location within 15000 of "+location.coords.latitude+","+location.coords.longitude} } );
+        
 
-            function loadBooks () {
-                
                 my_books.fetch( // Actual network call
 
                     // Success Callback
@@ -42,11 +45,13 @@
                         
                         // Re-apply jQuery Mobile styles
                         $('#books-list').listview('refresh');
+                        window.localStorage[mybooks]= JSON.stringify($("books-list"));
                     },
 
                     // Failure Callback
                     function () { alert("read failed"); }
                 );
+
             }
 
             function createBook() {
